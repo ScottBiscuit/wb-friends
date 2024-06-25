@@ -1,3 +1,72 @@
+import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
+
 export default function App() {
-  return <div>Hello</div>;
+  const [ friends, setFriends ] = useState([]);
+  const [ picture, setPicture ] = useState('');
+  const [ name, SetName ] = useState('')
+// -------
+
+  useEffect(() => {
+    const getSavedFriends = async() => {
+      const res = await axios.get('/api/friends')
+      setFriends(res.data)
+    }
+    getSavedFriends();
+  }, [])
+// -----
+
+  // const getSavedFriends = async () => {
+  //   const res = await axios.get('/api/friends');
+  //   setFriends(res.data);
+  // };
+
+  // useEffect(() => {
+  //   getSavedFriends();
+  // }, []);
+// ------
+  const addFriend = () => {
+    // need to copy friends so you don't modify state directly
+    const newFriends = [...friends];
+    newFriends.push({picture: picture, name: name});
+    setFriends(newFriends);
+
+    setPicture('');
+    SetName('');
+    console.log(friends);
+  };
+
+  const friendInfo = friends.map((friend) => {
+    return (
+    <div key={`${friend.name}`}>
+      <img width="100px" src={friend.picture} alt={friend.name} />
+      <span>{friend.name}</span>
+    
+    </div>
+  )
+    
+  })
+
+  return (
+  <div>
+    <label htmlFor="picture">Picture:</label>
+    <input 
+      id="picture" 
+      type="text"
+      value={picture}
+      onChange={(e) => (setPicture(e.target.value), console.log(e.target.value))
+      }
+    />
+    <label htmlFor="name">Name:</label>
+    <input 
+      id="name" 
+      type="text"
+      value={name}
+      onChange={(e) => (SetName(e.target.value), console.log(e.target.value))}
+    />
+    <button type="button" onClick={addFriend}>Add Friend</button>
+    {friendInfo}
+  </div>
+  );
 }
